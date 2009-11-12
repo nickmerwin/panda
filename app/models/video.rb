@@ -367,7 +367,7 @@ class Video < SimpleDB::Base
     
     # Common attributes for originals and encodings
     if self.status == 'original' or self.encoding?
-      [:filename, :original_filename, :width, :height, :duration].each do |k|
+      [:filename, :original_filename, :width, :height, :duration, :url].each do |k|
         r[:video][k] = self.send(k)
       end
       r[:video][:screenshot]  = self.clipping.filename(:screenshot)
@@ -557,6 +557,13 @@ RESPONSE
     transcoder.execute(recipe, self.recipe_options(self.parent_video.tmp_filepath, self.tmp_filepath))
   end
   
+  def encode_mov
+    Merb.logger.info "Encoding with encode_mov"
+    transcoder = RVideo::Transcoder.new
+    recipe = "ffmpeg -i $input_file$ -b 4000k $output_file$"
+    transcoder.execute recipe, :input_file => self.parent_video.tmp_filepath, :output_file => self.tmp_filepath
+  end
+  
   def encode_mp4_aac_flash
     Merb.logger.info "Encoding with encode_mp4_aac_flash"
     transcoder = RVideo::Transcoder.new
@@ -623,14 +630,18 @@ RESPONSE
         self.encode_flv_flash
       elsif self.container == "mp4" and self.audio_codec == "aac" and self.player == "flash"
         self.encode_mp4_aac_flash
+      elsif self.container == "mov"
+        self.encode_mov
       else # Try straight ffmpeg encode
         self.encode_unknown_format
       end
       
       self.upload_to_store
-      self.generate_thumbnail_selection
-      self.clipping.set_as_default
-      self.upload_thumbnail_selection
+      
+      ## This was erroring out...
+      # self.generate_thumbnail_selection
+      # self.clipping.set_as_default
+      # self.upload_thumbnail_selection
       
       self.notification = 0
       self.status = "success"
@@ -649,7 +660,7 @@ RESPONSE
       self.save
       FileUtils.rm parent_obj.tmp_filepath
       
-      Merb.logger.error "Unable to transcode file #{self.key}: #{$!.class} - #{$!.message}"
+      Merb.logger.error "Unable to transcode file #{self.key}: #{$!.class} - #{$!.message}\n#{$@.join "\n"}"
         
       raise
     end

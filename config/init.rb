@@ -22,7 +22,6 @@ dependency 'merb_helpers'
 dependency 'uuid'
 dependency 'amazon_sdb'
 dependency 'activesupport'
-dependency 'rvideo'
 
 # Dependencies in lib - not autoloaded in time so require them explicitly
 require 'simple_db'
