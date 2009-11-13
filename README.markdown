@@ -1,3 +1,14 @@
+Camatar SETUP:
+
+Profile.create! :title => "MOV", :container => "mov"
+
+
+wget http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2
+tar xjvf ffmpeg-0.5.tar.bz2
+cd ffmpeg-0.5
+./configure --enable-gpl --enable-postproc  --enable-pthreads --enable-x11grab  --enable-libfaac --enable-libfaad --enable-libgsm --enable-libtheora --enable-libvorbis   --enable-nonfree
+make && sudo make install
+
 Panda
 =====
 
