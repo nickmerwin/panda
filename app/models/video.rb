@@ -560,7 +560,7 @@ RESPONSE
   def encode_mov
     Merb.logger.info "Encoding with encode_mov"
     transcoder = RVideo::Transcoder.new
-    recipe = "ffmpeg -i $input_file$ -ar 22050 -b 4000k -async 1 -vsync 1 $output_file$"
+    recipe = "ffmpeg -i $input_file$ -b 4000k -async 1 -vsync 1 $output_file$"
     transcoder.execute recipe, :input_file => self.parent_video.tmp_filepath, :output_file => self.tmp_filepath
   end
   
